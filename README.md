@@ -1,4 +1,4 @@
-- 纯原生绘制的交易 k 线，包括缩放拖动指标绘图，完全模仿 Huobi k线的所有功能
+- Purely natively drawn trading k-lines, including zooming and dragging indicator drawing, completely imitating all functions of Huobi k-lines
 
 <image src="./example/1.png" width="300">
 <image src="./example/2.png" width="300">
