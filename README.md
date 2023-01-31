@@ -1,6 +1,7 @@
 - 纯原生绘制的交易 k 线，包括缩放拖动指标绘图，完全模仿 Huobi k线的所有功能
 
-<video src="./example/1.mp4" width="300">
+<image src="./example/1.png" width="300">
+<image src="./example/2.png" width="300">
 
 ## Usage
 
