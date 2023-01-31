@@ -5,7 +5,7 @@
 
 ## Usage
 
-[点击查看完整示例 Example](./example/App.js)
+[Example](./example/App.js)
 
 ```bash
 yarn add 'https://github.com/hellohublot/react-native-kline-view.git'
