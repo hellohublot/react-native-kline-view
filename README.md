@@ -2,8 +2,8 @@
 
 <div align="center">
   <img src="./example/logo.png" alt="React Native KLine View" width="120" height="120" />
-  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-  [![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android-lightgrey.svg)](https://reactnative.dev)
+  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+  [![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android-lightgrey)](https://reactnative.dev)
   
   **Professional K-Line (Candlestick) Chart Library for React Native**
   
@@ -13,16 +13,6 @@
 </div>
 
 React Native KLine View is a high-performance, feature-rich candlestick chart component designed for professional trading applications. Built with native optimization for both iOS and Android, it delivers smooth 60fps scrolling, zooming, and real-time data updates.
-
-🎯 Key Features:
-• Ultra-smooth 60fps performance with native rendering
-• Interactive drawing tools (trend lines, rectangles, text annotations)
-• Comprehensive technical indicators (MA, BOLL, MACD, KDJ, RSI, WR)
-• Dark/Light theme switching with smooth transitions
-• Real-time data streaming and updates
-• TypeScript support with complete type definitions
-• Cross-platform iOS & Android compatibility
-• React Native New Architecture ready
 
 Perfect for cryptocurrency exchanges, stock trading apps, financial dashboards, and any application requiring professional-grade market data visualization.
 
