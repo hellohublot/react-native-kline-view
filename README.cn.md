@@ -2,15 +2,16 @@
 
 <div align="center">
   <img src="./example/logo.png" alt="React Native KLine View" width="120" height="120" />
-  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-  [![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android-lightgrey)](https://reactnative.dev)
-  
-  **专业的React Native K线（蜡烛图）图表库**
-  
-  *超流畅渲染 • 交互式绘图工具 • 多种技术指标 • 深色/浅色主题*
-  
-  [English](./README.md) | 中文文档
 </div>
+
+**专业的React Native K线（蜡烛图）图表库**
+  
+*超流畅渲染 • 交互式绘图工具 • 多种技术指标 • 深色/浅色主题*
+  
+[English](./README.md) | 中文文档
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Platform](https://img.shields.io/badge/platform-ios%20%7C%20android-lightgrey)](https://reactnative.dev)
 
 React Native KLine View 是一个高性能、功能丰富的蜡烛图表组件，专为专业交易应用而设计。通过iOS和Android双平台的原生优化，提供流畅的60fps滚动、缩放和实时数据更新。
 适用于加密货币交易所、股票交易应用、金融仪表板以及任何需要专业级市场数据可视化的应用。
