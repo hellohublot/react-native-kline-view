@@ -58,9 +58,9 @@ Perfect for cryptocurrency exchanges, stock trading apps, financial dashboards, 
 
 <div align="center">
   <img src="./example/1.png" alt="Performance Demo" width="300" />
-  <img src="./example/2.png" alt="Performance Demo" width="300" />
+  <img src="./example/2.png" alt="Performance Demo" width="300" style="margin-left: 50px;" />
   <img src="./example/3.png" alt="Performance Demo" width="800" />
-  <img src="./example/3.gif" alt="Performance Demo" width="800" />
+  <img src="./example/4.gif" alt="Performance Demo" width="800" />
   
   *Smooth scrolling, zooming, and drawing operations at 60fps*
 </div>

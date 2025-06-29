@@ -56,10 +56,10 @@ React Native KLine View 是一个高性能、功能丰富的蜡烛图表组件�
 ## 🚀 性能演示
 
 <div align="center">
-  <img src="./example/1.png" alt="Performance Demo" width="300" />
-  <img src="./example/2.png" alt="Performance Demo" width="300" />
+  <img src="./example/1.png" alt="Performance Demo" width="300"  />
+  <img src="./example/2.png" alt="Performance Demo" width="300" style="margin-left: 50px;"  />
   <img src="./example/3.png" alt="Performance Demo" width="800" />
-  <img src="./example/3.gif" alt="Performance Demo" width="800" />
+  <img src="./example/4.gif" alt="Performance Demo" width="800" />
   
   *60fps 流畅滚动、缩放和绘图操作*
 </div>
