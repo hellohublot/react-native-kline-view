@@ -1,7 +1,7 @@
 # React Native KLine View
 
 <div align="center">
-  <img src="./example/logo.png" alt="React Native KLine View" width="120" height="120" />
+  <img src="./example/logo.png" alt="React Native KLine View" width="120" height="120" style="border-radius: 60px;" />
 </div>
 
 **Professional K-Line (Candlestick) Chart Library for React Native**
@@ -58,7 +58,8 @@ Perfect for cryptocurrency exchanges, stock trading apps, financial dashboards, 
 
 <div align="center">
   <img src="./example/1.png" alt="Performance Demo" width="300" />
-  <img src="./example/2.png" alt="Performance Demo" width="800" />
+  <img src="./example/2.png" alt="Performance Demo" width="300" />
+  <img src="./example/3.png" alt="Performance Demo" width="800" />
   <img src="./example/3.gif" alt="Performance Demo" width="800" />
   
   *Smooth scrolling, zooming, and drawing operations at 60fps*
