@@ -16,6 +16,30 @@ class HTKLineContainerView: UIView {
     @objc var onDrawItemComplete: RCTBubblingEventBlock?
     
     @objc var onDrawPointComplete: RCTBubblingEventBlock?
+    
+    @objc var optionList: String? {
+        didSet {
+            guard let optionList = optionList else {
+                return
+            }
+            
+            RNKLineView.queue.async { [weak self] in
+                do {
+                    guard let optionListData = optionList.data(using: .utf8),
+                          let optionListDict = try JSONSerialization.jsonObject(with: optionListData, options: .allowFragments) as? [String: Any] else {
+                        return
+                    }
+                    self?.configManager.reloadOptionList(optionListDict)
+                    DispatchQueue.main.async {
+                        guard let self = self else { return }
+                        self.reloadConfigManager(self.configManager)
+                    }
+                } catch {
+                    print("Error parsing optionList: \(error)")
+                }
+            }
+        }
+    }
 
     lazy var klineView: HTKLineView = {
         let klineView = HTKLineView.init(CGRect.zero, configManager)
@@ -27,19 +51,29 @@ class HTKLineContainerView: UIView {
         shotView.dimension = 100
         return shotView
     }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        addSubview(klineView)
-    }
-    
-    override func reactSetFrame(_ frame: CGRect) {
-        super.reactSetFrame(frame)
+
+    func setupChildViews() {
         klineView.frame = bounds
         let superShotView = reactSuperview()?.reactSuperview()?.reactSuperview()
         superShotView?.reactSuperview()?.addSubview(shotView)
         shotView.shotView = superShotView
         shotView.reactSetFrame(CGRect.init(x: 50, y: 50, width: shotView.dimension, height: shotView.dimension))
+    }
+
+    override var frame: CGRect {
+        didSet {
+	        setupChildViews()
+        }
+    }
+    
+    override func reactSetFrame(_ frame: CGRect) {
+        super.reactSetFrame(frame)
+        setupChildViews()
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(klineView)
     }
     
     required init?(coder: NSCoder) {

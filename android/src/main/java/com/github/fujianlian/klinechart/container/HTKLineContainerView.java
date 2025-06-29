@@ -45,7 +45,7 @@ public class HTKLineContainerView extends RelativeLayout {
             shotView.setEnabled(false);
             shotView.dimension = 300;
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(shotView.dimension, shotView.dimension);
-            layoutParams.setMargins(100, 300, 0, 0);
+            layoutParams.setMargins(50, 50, 0, 0);
             ((ViewGroup)willShotView.getParent().getParent()).addView(shotView, layoutParams);
         }
     }

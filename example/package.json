@@ -1,31 +1,42 @@
 {
-  "name": "ReactNativeDemo",
+  "name": "ReactNativeKlineExample",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "preinstall": "rm -rf ./ios/Pods && rm -rf ./android/app/build",
     "postinstall": "rm -rf ./node_modules/react-native-kline-view/example"
   },
   "dependencies": {
-    "react": "17.0.2",
-    "react-native": "0.66.0",
-    "react-native-pager-view": "5.4.0",
+    "react": "19.1.0",
+    "react-native": "0.80.0",
     "react-native-kline-view": "../"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.7",
-    "@babel/runtime": "^7.16.7",
-    "@react-native-community/eslint-config": "^3.0.1",
-    "babel-jest": "^27.4.6",
-    "eslint": "^8.7.0",
-    "jest": "^27.4.7",
-    "metro-react-native-babel-preset": "^0.66.2",
-    "react-test-renderer": "17.0.2"
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "19.0.0",
+    "@react-native-community/cli-platform-android": "19.0.0",
+    "@react-native-community/cli-platform-ios": "19.0.0",
+    "@react-native/babel-preset": "0.80.0",
+    "@react-native/eslint-config": "0.80.0",
+    "@react-native/metro-config": "0.80.0",
+    "@react-native/typescript-config": "0.80.0",
+    "@types/jest": "^29.5.13",
+    "@types/react": "^19.1.0",
+    "@types/react-test-renderer": "^19.1.0",
+    "eslint": "^8.19.0",
+    "jest": "^29.6.3",
+    "prettier": "2.8.8",
+    "react-test-renderer": "19.1.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "jest": {
     "preset": "react-native"

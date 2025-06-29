@@ -55,30 +55,26 @@ public class RNKLineView extends SimpleViewManager<HTKLineContainerView> {
 
 
 
-    @Override
-    public void receiveCommand(final HTKLineContainerView containerView, String commandId, ReadableArray optionArray) {
-    	final BaseKLineChartView lineChartView = containerView.klineView;
-    	final ReadableArray optionList = optionArray;
-        switch (commandId) {
-            case "reloadOptionList": {
-            	new Thread(new Runnable() {
-			        @Override
-			        public void run() {
-			        	int disableDecimalFeature = JSON.DEFAULT_PARSER_FEATURE & ~Feature.UseBigDecimal.getMask();
-		            	Map optionMap = (Map)JSON.parse((String)optionList.toArrayList().get(0), disableDecimalFeature);
-		            	containerView.configManager.reloadOptionList(optionMap);
-						containerView.post(new Runnable() {
-							@Override
-							public void run() {
-								containerView.reloadConfigManager();
-							}
-						});
-			        }
-			    }).start();
-            	
-                break;
-            }
+    @ReactProp(name = "optionList")
+    public void setOptionList(final HTKLineContainerView containerView, String optionList) {
+        if (optionList == null) {
+            return;
         }
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int disableDecimalFeature = JSON.DEFAULT_PARSER_FEATURE & ~Feature.UseBigDecimal.getMask();
+                Map optionMap = (Map)JSON.parse(optionList, disableDecimalFeature);
+                containerView.configManager.reloadOptionList(optionMap);
+                containerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        containerView.reloadConfigManager();
+                    }
+                });
+            }
+        }).start();
     }
 
 
