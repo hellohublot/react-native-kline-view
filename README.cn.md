@@ -67,11 +67,6 @@ React Native KLine View 是一个高性能、功能丰富的蜡烛图表组件�
 ## 📦 安装
 
 ```bash
-# 使用 npm
-npm install react-native-kline-view
-
-# 使用 yarn
-yarn add react-native-kline-view
 
 # 开发版本
 yarn add https://github.com/hellohublot/react-native-kline-view.git
@@ -245,7 +240,7 @@ Android 无需额外配置。
 
 ## 📞 支持
 
-- 📧 **邮箱**: hublot@aliyun.com
+- 📧 **邮箱**: hellohublot@gmail.com
 - 💬 **问题**: [GitHub Issues](https://github.com/hellohublot/react-native-kline-view/issues)
 - 🎯 **示例**: 查看 [example/App.js](./example/App.js) 获取全面的使用方法
 

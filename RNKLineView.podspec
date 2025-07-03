@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/hellohublot"
   s.license      = "MIT"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-  s.author             = { "hellohublot" => "hublot@aliyun.com" }
+  s.author             = { "hellohublot" => "hellohublot@gmail.com" }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "oneMore", :tag => "master" }
   s.source_files  = "ios/Classes/**/*"

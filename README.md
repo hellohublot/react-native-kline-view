@@ -243,7 +243,7 @@ While we honor the inspiration from the original project, this implementation re
 
 ## 📞 Support
 
-- 📧 **Email**: hublot@aliyun.com
+- 📧 **Email**: hellohublot@gmail.com
 - 💬 **Issues**: [GitHub Issues](https://github.com/hellohublot/react-native-kline-view/issues)
 - 🎯 **Examples**: Check out [example/App.js](./example/App.js) for comprehensive usage
 
