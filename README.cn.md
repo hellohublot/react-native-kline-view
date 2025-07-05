@@ -69,7 +69,7 @@ React Native KLine View 是一个高性能、功能丰富的蜡烛图表组件�
 ```bash
 
 # 开发版本
-yarn add https://github.com/hellohublot/react-native-kline-view.git
+yarn add react-native-kline-view@https://github.com/hellohublot/react-native-kline-view.git
 ```
 
 ### iOS 配置

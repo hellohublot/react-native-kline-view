@@ -70,7 +70,7 @@ Perfect for cryptocurrency exchanges, stock trading apps, financial dashboards, 
 ```bash
 
 # For development version
-yarn add https://github.com/hellohublot/react-native-kline-view.git
+yarn add react-native-kline-view@https://github.com/hellohublot/react-native-kline-view.git
 ```
 
 ### iOS Setup
