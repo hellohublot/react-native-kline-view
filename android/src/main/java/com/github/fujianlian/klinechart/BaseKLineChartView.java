@@ -1028,7 +1028,14 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
      * @return
      */
     public KLineEntity getItem(int position) {
-    	return configManager.modelArray.get(position);
+        int size = configManager.modelArray == null ? 0 : configManager.modelArray.size();
+        if (size <= 0) {
+            KLineEntity empty = new KLineEntity();
+            empty.Date = "";
+            return empty;
+        }
+        int safeIndex = Math.max(0, Math.min(position, size - 1));
+        return configManager.modelArray.get(safeIndex);
     }
 
     /**
