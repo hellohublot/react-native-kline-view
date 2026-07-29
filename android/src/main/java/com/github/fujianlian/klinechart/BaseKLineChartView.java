@@ -561,7 +561,7 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
             }
         }
         //--------------画中间子图的值-------------
-        if (mVolDraw != null) {
+        if (mVolDraw != null && mVolRect.height() > 0) {
             IValueFormatter formatter = mVolDraw.getValueFormatter();
             if (formatter instanceof ValueFormatter) {
                 ValueFormatter valueFormatter = (ValueFormatter)formatter;

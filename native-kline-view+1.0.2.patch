@@ -1,0 +1,13 @@
+diff --git a/node_modules/native-kline-view/android/src/main/java/com/github/fujianlian/klinechart/BaseKLineChartView.java b/node_modules/native-kline-view/android/src/main/java/com/github/fujianlian/klinechart/BaseKLineChartView.java
+index e6d68dd..b14c32b 100755
+--- a/node_modules/native-kline-view/android/src/main/java/com/github/fujianlian/klinechart/BaseKLineChartView.java
++++ b/node_modules/native-kline-view/android/src/main/java/com/github/fujianlian/klinechart/BaseKLineChartView.java
+@@ -561,7 +561,7 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
+             }
+         }
+         //--------------画中间子图的值-------------
+-        if (mVolDraw != null) {
++        if (mVolDraw != null && mVolRect.height() > 0) {
+             IValueFormatter formatter = mVolDraw.getValueFormatter();
+             if (formatter instanceof ValueFormatter) {
+                 ValueFormatter valueFormatter = (ValueFormatter)formatter;
