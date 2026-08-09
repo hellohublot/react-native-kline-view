@@ -35,6 +35,9 @@ public class MainDraw implements IChartDraw<ICandle> {
     private Paint primaryPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private Paint minuteGradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint openTradePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint closeTradePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint markerCountTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private Paint mSelectorTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mSelectorBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -60,12 +63,21 @@ public class MainDraw implements IChartDraw<ICandle> {
         minuteGradientPaint.setStrokeJoin(Paint.Join.ROUND);
         minuteGradientPaint.setStrokeCap(Paint.Cap.ROUND);
         minuteGradientPaint.setStyle(Paint.Style.FILL);
+
+        openTradePaint.setStyle(Paint.Style.FILL);
+        closeTradePaint.setStyle(Paint.Style.FILL);
+
+        markerCountTextPaint.setColor(Color.WHITE);
+        markerCountTextPaint.setTextAlign(Paint.Align.CENTER);
+        markerCountTextPaint.setFakeBoldText(true);
     }
 
     public void reloadColor(BaseKLineChartView view) {
         mRedPaint.setColor(view.configManager.increaseColor);
         mGreenPaint.setColor(view.configManager.decreaseColor);
         mLinePaint.setColor(view.configManager.minuteLineColor);
+        openTradePaint.setColor(view.configManager.increaseColor);
+        closeTradePaint.setColor(view.configManager.decreaseColor);
     }
 
     public void setPrimaryStatus(PrimaryStatus primaryStatus) {
@@ -123,6 +135,9 @@ public class MainDraw implements IChartDraw<ICandle> {
     @Override
     public void drawTranslated(@Nullable ICandle lastPoint, @NonNull ICandle curPoint, float lastX, float curX, @NonNull Canvas canvas, @NonNull BaseKLineChartView view, int position) {
         if (view.isMinute) {
+            KLineEntity currentItem = (KLineEntity) curPoint;
+            drawTradeMarker(view, canvas, curX, currentItem.openTradePrice, currentItem.closeTradePrice, currentItem.openTradeCount, currentItem.closeTradeCount, openTradePaint, false);
+            drawTradeMarker(view, canvas, curX, currentItem.closeTradePrice, currentItem.openTradePrice, currentItem.closeTradeCount, currentItem.openTradeCount, closeTradePaint, true);
             return;
         }
         drawCandle(view, canvas, curX, curPoint.getHighPrice(), curPoint.getLowPrice(), curPoint.getOpenPrice(), curPoint.getClosePrice());
@@ -149,6 +164,34 @@ public class MainDraw implements IChartDraw<ICandle> {
                 primaryPaint.setColor(view.configManager.targetColorList[2]);
                 view.drawMainLine(canvas, primaryPaint, lastX, lastPoint.getDn(), curX, curPoint.getDn());
             }
+        }
+
+        KLineEntity currentItem = (KLineEntity) curPoint;
+        drawTradeMarker(view, canvas, curX, currentItem.openTradePrice, currentItem.closeTradePrice, currentItem.openTradeCount, currentItem.closeTradeCount, openTradePaint, false);
+        drawTradeMarker(view, canvas, curX, currentItem.closeTradePrice, currentItem.openTradePrice, currentItem.closeTradeCount, currentItem.openTradeCount, closeTradePaint, true);
+
+    }
+
+    private void drawTradeMarker(BaseKLineChartView view, Canvas canvas, float x, float price, float siblingPrice, int tradeCount, int siblingCount, Paint paint, boolean shouldShiftOnOverlap) {
+        if (view.configManager.useCustomTradeMarker) {
+            return;
+        }
+        if (Float.isNaN(price) || Float.isInfinite(price)) {
+            return;
+        }
+
+        float y = view.yFromValue(price);
+        float radius = ViewUtil.Dp2Px(mContext, 3.5f) + Math.max(0, Math.min(tradeCount - 1, 3)) * ViewUtil.Dp2Px(mContext, 0.8f);
+        float markerY = y;
+
+        canvas.drawCircle(x, markerY, radius, paint);
+
+        if (tradeCount > 1) {
+            String label = tradeCount > 9 ? "9+" : String.valueOf(tradeCount);
+            markerCountTextPaint.setTextSize(ViewUtil.Dp2Px(mContext, tradeCount > 9 ? 7f : 8f));
+            Paint.FontMetrics fontMetrics = markerCountTextPaint.getFontMetrics();
+            float textY = markerY - (fontMetrics.ascent + fontMetrics.descent) / 2f;
+            canvas.drawText(label, x, textY, markerCountTextPaint);
         }
 
     }

@@ -56,6 +56,29 @@ public class HTKLineContainerView extends RelativeLayout {
     }
 
     public void reloadConfigManager() {
+        if (klineView.configManager.fitBarsCount > 0 && getWidth() > 0) {
+            int visibleCount = Math.min(
+                    klineView.configManager.modelArray.size(),
+                    klineView.configManager.fitBarsCount
+            );
+
+            if (visibleCount > 0) {
+                float availableWidth = Math.max(0f, getWidth() - klineView.configManager.paddingRight);
+                if (availableWidth > 0f) {
+                    float fittedItemWidth = availableWidth / visibleCount;
+                    fittedItemWidth = Math.max(0.2f, fittedItemWidth);
+                    klineView.configManager.itemWidth = fittedItemWidth;
+                    klineView.configManager.candleWidth = Math.max(0.1f, fittedItemWidth * 0.72f);
+                    klineView.configManager.scrollEnabled = false;
+                    klineView.setScaleEnable(false);
+                    klineView.resetChartScale();
+                }
+            }
+        } else {
+            klineView.setScaleEnable(true);
+        }
+
+        klineView.setScrollEnable(klineView.configManager.scrollEnabled);
         klineView.changeMainDrawType(klineView.configManager.primaryStatus);
         klineView.changeSecondDrawType(klineView.configManager.secondStatus);
         klineView.setMainDrawLine(klineView.configManager.isMinute);
@@ -133,6 +156,32 @@ public class HTKLineContainerView extends RelativeLayout {
                         id,
                         RNKLineView.onDrawPointCompleteKey,
                         map
+                );
+            }
+        };
+        configManager.onTradeMarkersLayout = new HTKLineCallback() {
+            @Override
+            public void invoke(Object... args) {
+                @SuppressWarnings("unchecked")
+                java.util.List<java.util.Map<String, Object>> markerList =
+                        (java.util.List<java.util.Map<String, Object>>) args[0];
+                WritableArray markersArray = Arguments.createArray();
+                for (java.util.Map<String, Object> marker : markerList) {
+                    WritableMap m = Arguments.createMap();
+                    m.putDouble("x", ((Number) marker.get("x")).doubleValue());
+                    m.putDouble("y", ((Number) marker.get("y")).doubleValue());
+                    m.putDouble("price", ((Number) marker.get("price")).doubleValue());
+                    m.putString("type", (String) marker.get("type"));
+                    m.putInt("count", ((Number) marker.get("count")).intValue());
+                    m.putDouble("timestamp", ((Number) marker.get("timestamp")).doubleValue());
+                    markersArray.pushMap(m);
+                }
+                WritableMap payload = Arguments.createMap();
+                payload.putArray("markers", markersArray);
+                reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                        id,
+                        RNKLineView.onTradeMarkersLayoutKey,
+                        payload
                 );
             }
         };

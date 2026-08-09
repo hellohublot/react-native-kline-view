@@ -10,6 +10,50 @@ import UIKit
 
 class HTMainDraw: NSObject, HTKLineDrawProtocol {
 
+    private func markerRadius(_ count: Int) -> CGFloat {
+        return 3.5 + CGFloat(max(0, min(count - 1, 3))) * 0.8
+    }
+
+    private func drawTradeMarker(_ value: CGFloat, _ siblingValue: CGFloat, _ count: Int, _ siblingCount: Int, _ index: Int, _ maxValue: CGFloat, _ minValue: CGFloat, _ baseY: CGFloat, _ height: CGFloat, _ context: CGContext, _ configManager: HTKLineConfigManager, _ color: UIColor, _ shouldShiftOnOverlap: Bool) {
+        guard !configManager.useCustomTradeMarker else { return }
+        guard !value.isNaN, !value.isInfinite else {
+            return
+        }
+
+        let itemWidth = configManager.itemWidth
+        let scale = (maxValue - minValue) / height
+        guard scale != 0 else {
+            return
+        }
+
+        let paddingHorizontal = (itemWidth - configManager.lineWidth) / 2
+        let x = CGFloat(index) * itemWidth + paddingHorizontal
+        let y = baseY + (maxValue - value) / scale
+        let radius = markerRadius(count)
+
+        var markerY = y
+
+        context.setFillColor(color.cgColor)
+        context.fillEllipse(in: CGRect(x: x - radius, y: markerY - radius, width: radius * 2, height: radius * 2))
+
+        if count > 1 {
+            let text = count > 9 ? "9+" : "\(count)"
+            let font = UIFont.systemFont(ofSize: count > 9 ? 7 : 8, weight: .semibold)
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: UIColor.white,
+            ]
+            let textSize = text.size(withAttributes: attributes)
+            let textRect = CGRect(
+                x: x - textSize.width / 2,
+                y: markerY - textSize.height / 2,
+                width: textSize.width,
+                height: textSize.height
+            )
+            text.draw(in: textRect, withAttributes: attributes)
+        }
+    }
+
     func minMaxRange(_ visibleModelArray: [HTKLineModel], _ configManager: HTKLineConfigManager) -> Range<CGFloat> {
         var maxValue = CGFloat.leastNormalMagnitude
         var minValue = CGFloat.greatestFiniteMagnitude
@@ -74,6 +118,8 @@ class HTMainDraw: NSObject, HTKLineDrawProtocol {
     func drawLine(_ model: HTKLineModel, _ lastModel: HTKLineModel, _ maxValue: CGFloat, _ minValue: CGFloat, _ baseY: CGFloat, _ height: CGFloat, _ index: Int, _ lastIndex: Int, _ context: CGContext, _ configManager: HTKLineConfigManager) {
         if (configManager.isMinute) {
             drawLine(value: model.close, lastValue: lastModel.close, maxValue: maxValue, minValue: minValue, baseY: baseY, height: height, index: index, lastIndex: lastIndex, color: configManager.minuteLineColor, isBezier: true, context: context, configManager: configManager)
+            drawTradeMarker(model.openTradePrice, model.closeTradePrice, model.openTradeCount, model.closeTradeCount, index, maxValue, minValue, baseY, height, context, configManager, configManager.increaseColor, false)
+            drawTradeMarker(model.closeTradePrice, model.openTradePrice, model.closeTradeCount, model.openTradeCount, index, maxValue, minValue, baseY, height, context, configManager, configManager.decreaseColor, true)
         } else {
             switch configManager.mainType {
             case .none:
@@ -93,6 +139,9 @@ class HTMainDraw: NSObject, HTKLineDrawProtocol {
                     drawLine(value: item["value"] as? CGFloat ?? 0, lastValue: item["lastValue"] as? CGFloat ?? 0, maxValue: maxValue, minValue: minValue, baseY: baseY, height: height, index: index, lastIndex: lastIndex, color: item["color"] as? UIColor ?? UIColor.orange, isBezier: false, context: context, configManager: configManager)
                 }
             }
+
+            drawTradeMarker(model.openTradePrice, model.closeTradePrice, model.openTradeCount, model.closeTradeCount, index, maxValue, minValue, baseY, height, context, configManager, configManager.increaseColor, false)
+            drawTradeMarker(model.closeTradePrice, model.openTradePrice, model.closeTradeCount, model.openTradeCount, index, maxValue, minValue, baseY, height, context, configManager, configManager.decreaseColor, true)
         }
     }
 

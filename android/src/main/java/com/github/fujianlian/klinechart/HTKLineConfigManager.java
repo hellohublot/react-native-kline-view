@@ -22,6 +22,10 @@ public class HTKLineConfigManager {
 
 	public Boolean shouldScrollToEnd = true;
 
+    public Boolean scrollEnabled = true;
+
+    public int fitBarsCount = 0;
+
 
 	public int shotBackgroundColor = Color.RED;
 
@@ -55,6 +59,10 @@ public class HTKLineConfigManager {
     public HTKLineCallback onDrawItemDidTouch;
 
     public HTKLineCallback onDrawPointComplete;
+
+    public boolean useCustomTradeMarker = false;
+
+    public HTKLineCallback onTradeMarkersLayout;
 
 
 
@@ -222,6 +230,37 @@ public class HTKLineConfigManager {
         entity.j = ((Number)this.getOrDefault(keyValue, "kdjK", 0.0)).floatValue();
         entity.rsiList = HTKLineTargetItem.packModelArray((List) this.getOrDefault(keyValue, "rsiList", new ArrayList()));
         entity.wrList = HTKLineTargetItem.packModelArray((List) this.getOrDefault(keyValue, "wrList", new ArrayList()));
+
+        Object openTradePrice = keyValue.get("openTradePrice");
+        if (openTradePrice instanceof Number) {
+            entity.openTradePrice = ((Number) openTradePrice).floatValue();
+        }
+
+        Object closeTradePrice = keyValue.get("closeTradePrice");
+        if (closeTradePrice instanceof Number) {
+            entity.closeTradePrice = ((Number) closeTradePrice).floatValue();
+        }
+
+        Object openTradeCount = keyValue.get("openTradeCount");
+        if (openTradeCount instanceof Number) {
+            entity.openTradeCount = ((Number) openTradeCount).intValue();
+        }
+
+        Object openTradeTimestamp = keyValue.get("openTradeTimestamp");
+        if (openTradeTimestamp instanceof Number) {
+            entity.openTradeTimestamp = ((Number) openTradeTimestamp).doubleValue();
+        }
+
+        Object closeTradeCount = keyValue.get("closeTradeCount");
+        if (closeTradeCount instanceof Number) {
+            entity.closeTradeCount = ((Number) closeTradeCount).intValue();
+        }
+
+        Object closeTradeTimestamp = keyValue.get("closeTradeTimestamp");
+        if (closeTradeTimestamp instanceof Number) {
+            entity.closeTradeTimestamp = ((Number) closeTradeTimestamp).doubleValue();
+        }
+
         return entity;
     }
 
@@ -240,9 +279,19 @@ public class HTKLineConfigManager {
 
     public void reloadOptionList(Map optionList) {
 
+        Number fitBarsCountValue = (Number) optionList.get("fitBarsCount");
+        if (fitBarsCountValue != null) {
+            this.fitBarsCount = Math.max(0, fitBarsCountValue.intValue());
+        }
+
     	List modelArray = (List)optionList.get("modelArray");
     	if (modelArray != null) {
     		this.modelArray = this.packModelList(modelArray);
+
+            if (this.fitBarsCount > 0 && this.modelArray.size() > this.fitBarsCount) {
+                int fromIndex = this.modelArray.size() - this.fitBarsCount;
+                this.modelArray = new ArrayList<>(this.modelArray.subList(fromIndex, this.modelArray.size()));
+            }
     	}
 
     	Map targetList = (Map)optionList.get("targetList");
@@ -318,6 +367,11 @@ public class HTKLineConfigManager {
             this.shouldScrollToEnd = shouldScrollToEnd;
         }
 
+        Boolean scrollEnabled = (Boolean)optionList.get("scrollEnabled");
+        if (scrollEnabled != null) {
+            this.scrollEnabled = scrollEnabled;
+        }
+
         if (shouldReloadDrawItemIndex >= HTDrawState.showPencil) {
             this.shouldScrollToEnd = false;
         }
@@ -373,56 +427,54 @@ public class HTKLineConfigManager {
 
 
 
-    	Map colorList = (Map)configList.get("colorList");
-        this.increaseColor = ((Number) colorList.get("increaseColor")).intValue();
-        this.decreaseColor = ((Number) colorList.get("decreaseColor")).intValue();
+        Map colorList = (Map) configList.get("colorList");
+        if (colorList != null) {
+            Number v;
+            v = (Number) colorList.get("increaseColor"); if (v != null) this.increaseColor = v.intValue();
+            v = (Number) colorList.get("decreaseColor"); if (v != null) this.decreaseColor = v.intValue();
+        }
 
-        this.mainFlex = ((Number)configList.get("mainFlex")).floatValue();
-        this.volumeFlex = ((Number)configList.get("volumeFlex")).floatValue();
+        { Number v = (Number) configList.get("mainFlex");        if (v != null) this.mainFlex        = v.floatValue(); }
+        { Number v = (Number) configList.get("volumeFlex");      if (v != null) this.volumeFlex      = v.floatValue(); }
+        { Number v = (Number) configList.get("minuteLineColor"); if (v != null) this.minuteLineColor = v.intValue();   }
+        { Number v = (Number) configList.get("paddingRight");    if (v != null) this.paddingRight    = v.floatValue(); }
+        { Number v = (Number) configList.get("paddingTop");      if (v != null) this.paddingTop      = v.floatValue(); }
+        { Number v = (Number) configList.get("paddingBottom");   if (v != null) this.paddingBottom   = v.floatValue(); }
+        { Number v = (Number) configList.get("itemWidth");       if (v != null) this.itemWidth       = v.floatValue(); }
+        { Number v = (Number) configList.get("candleWidth");     if (v != null) this.candleWidth     = v.floatValue(); }
 
-        
-        this.minuteLineColor = ((Number) configList.get("minuteLineColor")).intValue();
-        this.paddingRight = ((Number)configList.get("paddingRight")).floatValue();
-        this.paddingTop = ((Number)configList.get("paddingTop")).floatValue();
-        this.paddingBottom = ((Number)configList.get("paddingBottom")).floatValue();
-        this.itemWidth = ((Number)configList.get("itemWidth")).floatValue();
-        this.candleWidth = ((Number)configList.get("candleWidth")).floatValue();
+        { Object v = configList.get("fontFamily");               if (v != null) this.fontFamily      = v.toString();   }
+        { Number v = (Number) configList.get("textColor");                  if (v != null) this.textColor                  = v.intValue();   }
+        { Number v = (Number) configList.get("headerTextFontSize");         if (v != null) this.headerTextFontSize         = v.floatValue(); }
+        { Number v = (Number) configList.get("rightTextFontSize");          if (v != null) this.rightTextFontSize          = v.floatValue(); }
+        { Number v = (Number) configList.get("candleTextFontSize");         if (v != null) this.candleTextFontSize         = v.floatValue(); }
+        { Number v = (Number) configList.get("candleTextColor");            if (v != null) this.candleTextColor            = v.intValue();   }
+        { Number v = (Number) configList.get("closePriceCenterSeparatorColor");   if (v != null) this.closePriceCenterSeparatorColor   = v.intValue(); }
+        { Number v = (Number) configList.get("closePriceCenterBorderColor");      if (v != null) this.closePriceCenterBorderColor      = v.intValue(); }
+        { Number v = (Number) configList.get("closePriceCenterBackgroundColor");  if (v != null) this.closePriceCenterBackgroundColor  = v.intValue(); }
+        { Number v = (Number) configList.get("closePriceCenterTriangleColor");    if (v != null) this.closePriceCenterTriangleColor    = v.intValue(); }
+        { Number v = (Number) configList.get("closePriceRightSeparatorColor");    if (v != null) this.closePriceRightSeparatorColor    = v.intValue(); }
+        { Number v = (Number) configList.get("closePriceRightBackgroundColor");   if (v != null) this.closePriceRightBackgroundColor   = v.intValue(); }
+        { String v = (String) configList.get("closePriceRightLightLottieSource"); if (v != null) this.closePriceRightLightLottieSource = v; }
+        { String v = (String) configList.get("closePriceRightLightLottieFloder"); if (v != null) this.closePriceRightLightLottieFloder = v; }
+        { Number v = (Number) configList.get("closePriceRightLightLottieScale");  if (v != null) this.closePriceRightLightLottieScale  = v.floatValue(); }
 
-        this.fontFamily = (configList.get("fontFamily")).toString();
-        this.textColor = ((Number) configList.get("textColor")).intValue();
-        this.headerTextFontSize = ((Number)configList.get("headerTextFontSize")).floatValue();
-        this.rightTextFontSize = ((Number)configList.get("rightTextFontSize")).floatValue();
-        this.candleTextFontSize = ((Number)configList.get("candleTextFontSize")).floatValue();
-        this.candleTextColor = ((Number) configList.get("candleTextColor")).intValue();
-        this.closePriceCenterSeparatorColor = ((Number) configList.get("closePriceCenterSeparatorColor")).intValue();
-        this.closePriceCenterBorderColor = ((Number) configList.get("closePriceCenterBorderColor")).intValue();
-        this.closePriceCenterBackgroundColor = ((Number) configList.get("closePriceCenterBackgroundColor")).intValue();
-        this.closePriceCenterTriangleColor = ((Number) configList.get("closePriceCenterTriangleColor")).intValue();
-        this.closePriceRightSeparatorColor = ((Number) configList.get("closePriceRightSeparatorColor")).intValue();
-        this.closePriceRightBackgroundColor = ((Number) configList.get("closePriceRightBackgroundColor")).intValue();
-        this.closePriceRightLightLottieSource = (String) configList.get("closePriceRightLightLottieSource");
-        this.closePriceRightLightLottieFloder = (String) configList.get("closePriceRightLightLottieFloder");
-        this.closePriceRightLightLottieScale = ((Number)configList.get("closePriceRightLightLottieScale")).floatValue();
+        { Object v = configList.get("panelGradientColorList");    if (v != null) this.panelGradientColorList    = parseColorList(v);    }
+        { Object v = configList.get("panelGradientLocationList"); if (v != null) this.panelGradientLocationList = parseLocationList(v); }
+        { Number v = (Number) configList.get("panelBackgroundColor");       if (v != null) this.panelBackgroundColor       = v.intValue();   }
+        { Number v = (Number) configList.get("panelBorderColor");           if (v != null) this.panelBorderColor           = v.intValue();   }
+        { Number v = (Number) configList.get("selectedPointContainerColor");if (v != null) this.selectedPointContainerColor= v.intValue();   }
+        { Number v = (Number) configList.get("selectedPointContentColor");  if (v != null) this.selectedPointContentColor  = v.intValue();   }
+        { Number v = (Number) configList.get("panelMinWidth");              if (v != null) this.panelMinWidth              = v.floatValue(); }
+        { Number v = (Number) configList.get("panelTextFontSize");          if (v != null) this.panelTextFontSize          = v.floatValue(); }
 
-        this.panelGradientColorList = parseColorList(configList.get("panelGradientColorList"));
-        this.panelGradientLocationList = parseLocationList(configList.get("panelGradientLocationList"));
-        this.panelBackgroundColor = ((Number) configList.get("panelBackgroundColor")).intValue();
-        this.panelBorderColor = ((Number) configList.get("panelBorderColor")).intValue();
-        this.selectedPointContainerColor = ((Number) configList.get("selectedPointContainerColor")).intValue();
-        this.selectedPointContentColor = ((Number) configList.get("selectedPointContentColor")).intValue();
-        this.panelMinWidth = ((Number)configList.get("panelMinWidth")).floatValue();
-        this.panelTextFontSize = ((Number)configList.get("panelTextFontSize")).floatValue();
+        { Number v = (Number) configList.get("minuteVolumeCandleColor");    if (v != null) this.minuteVolumeCandleColor    = v.intValue();   }
+        { Number v = (Number) configList.get("minuteVolumeCandleWidth");    if (v != null) this.minuteVolumeCandleWidth    = v.floatValue(); }
+        { Number v = (Number) configList.get("macdCandleWidth");            if (v != null) this.macdCandleWidth            = v.floatValue(); }
 
-
-
-        this.minuteVolumeCandleColor = ((Number) configList.get("minuteVolumeCandleColor")).intValue();
-        this.minuteVolumeCandleWidth = ((Number)configList.get("minuteVolumeCandleWidth")).floatValue();
-        this.macdCandleWidth = ((Number)configList.get("macdCandleWidth")).floatValue();
-
-
-        this.targetColorList = parseColorList(configList.get("targetColorList"));
-        this.minuteGradientColorList = parseColorList(configList.get("minuteGradientColorList"));
-        this.minuteGradientLocationList = parseLocationList(configList.get("minuteGradientLocationList"));
+        { Object v = configList.get("targetColorList");            if (v != null) this.targetColorList            = parseColorList(v);    }
+        { Object v = configList.get("minuteGradientColorList");    if (v != null) this.minuteGradientColorList    = parseColorList(v);    }
+        { Object v = configList.get("minuteGradientLocationList"); if (v != null) this.minuteGradientLocationList = parseLocationList(v); }
 
         
     }

@@ -6,7 +6,7 @@
 
 **专业的 React Native / 原生 iOS & Android / Flutter K 线（蜡烛图）图表库**
 
-*超流畅渲染 • 交互式绘图工具 • 多种技术指标 • 深色/浅色主题*
+_超流畅渲染 • 交互式绘图工具 • 多种技术指标 • 深色/浅色主题_
 
 [English](./README.md) | 中文文档
 
@@ -91,11 +91,13 @@ yarn add native-kline-view@https://github.com/hellohublot/native-kline-view.git
 ```
 
 ### React Native iOS 配置
+
 ```bash
 cd ios && pod install
 ```
 
 ### React Native Android 配置
+
 Android 无需额外配置。
 
 ## 🧩 Flutter（Git）
@@ -112,11 +114,13 @@ iOS:
 说明：Flutter 插件依赖原生 Pod，请在你的 Flutter Podfile 里二选一：
 
 本地路径（推荐，用于本仓库）：
+
 ```ruby
 pod 'NativeKLineView', :path => '../../../ios'
 ```
 
 或远程 podspec（无需本地 clone）：
+
 ```ruby
 pod 'NativeKLineView', :podspec => 'https://raw.githubusercontent.com/hellohublot/native-kline-view/main/ios/NativeKLineView.podspec'
 ```
@@ -133,11 +137,13 @@ NativeKLineView(
 ## 🔌 原生 iOS
 
 Podfile via Git:
+
 ```ruby
 pod 'NativeKLineView', :podspec => 'https://raw.githubusercontent.com/hellohublot/native-kline-view/main/ios/NativeKLineView.podspec'
 ```
 
 或使用本地 clone：
+
 ```ruby
 pod 'NativeKLineView', :path => '../native-kline-view/ios'
 ```
@@ -177,30 +183,75 @@ XML 使用方式：
 查看完整的实现示例，请参考 **[example/App.js](./examples/react-native/App.js)**
 
 示例应用展示了：
+
 - 🎛️ **完整UI控件** - 时间周期选择器、指标切换器、绘图工具
-- 🎨 **主题管理** - 深色/浅色模式平滑过渡  
+- 🎨 **主题管理** - 深色/浅色模式平滑过渡
 - 📊 **指标管理** - 动态指标切换和配置
 - ✏️ **绘图工具** - 全功能绘图界面和工具选择
 - 📱 **响应式设计** - 适配不同屏幕尺寸和方向
+
+## 🆕 自定义成交标记组件
+
+现在你可以通过 `tradeComponent` 使用自己的 React 组件渲染成交标记，而不是默认原生圆点。
+
+<div align="center">
+  <img src="./example/chart.png" alt="自定义成交标记叠加" width="720" />
+
+_示例：分时图中的自定义成交标记_
+
+</div>
+
+### 使用方式
+
+```tsx
+import React from "react";
+import { View, Text } from "react-native";
+import RNKLineView from "react-native-kline-view";
+
+const TradeMarker = (trade: { type: "buy" | "sell" }, count: number) => (
+  <View
+    style={{
+      backgroundColor: trade.type === "buy" ? "#11c766" : "#ff5b6e",
+      borderRadius: 10,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+    }}
+  >
+    <Text style={{ color: "#fff", fontSize: 10, fontWeight: "700" }}>
+      {trade.type.toUpperCase()} {count}
+    </Text>
+  </View>
+);
+
+export default function Chart() {
+  return (
+    <RNKLineView
+      optionList={JSON.stringify(optionList)}
+      tradeComponent={TradeMarker}
+    />
+  );
+}
+```
 
 ## 📊 组件属性
 
 ### 核心属性
 
-| 属性 | 类型 | 必需 | 默认值 | 描述 |
-|----------|------|----------|---------|-------------|
-| `optionList` | string | ✅ | - | 包含所有图表配置和数据的JSON字符串 |
-| `onDrawItemDidTouch` | function | ❌ | - | 当绘图项目被触摸时的回调 |
-| `onDrawItemComplete` | function | ❌ | - | 当绘图项目完成时的回调 |
-| `onDrawPointComplete` | function | ❌ | - | 当绘图点完成时的回调 |
+| 属性                  | 类型                          | 必需 | 默认值 | 描述                                                               |
+| --------------------- | ----------------------------- | ---- | ------ | ------------------------------------------------------------------ |
+| `optionList`          | string                        | ✅   | -      | 包含所有图表配置和数据的JSON字符串                                 |
+| `tradeComponent`      | `(trade, count) => ReactNode` | ❌   | -      | 自定义成交标记渲染函数（`trade = { id, timestamp, price, type }`） |
+| `onDrawItemDidTouch`  | function                      | ❌   | -      | 当绘图项目被触摸时的回调                                           |
+| `onDrawItemComplete`  | function                      | ❌   | -      | 当绘图项目完成时的回调                                             |
+| `onDrawPointComplete` | function                      | ❌   | -      | 当绘图点完成时的回调                                               |
 
 ### 事件回调详情
 
-| 回调函数 | 参数 | 描述 |
-|----------|------------|-------------|
-| `onDrawItemDidTouch` | `{ shouldReloadDrawItemIndex, drawColor, drawLineHeight, drawDashWidth, drawDashSpace, drawIsLock }` | 用户触摸现有绘图项目时触发，返回绘图属性用于编辑 |
-| `onDrawItemComplete` | `{}` | 用户完成创建新绘图项目时触发 |
-| `onDrawPointComplete` | `{ pointCount }` | 用户完成向绘图添加点时触发（对多点绘图有用） |
+| 回调函数              | 参数                                                                                                 | 描述                                             |
+| --------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `onDrawItemDidTouch`  | `{ shouldReloadDrawItemIndex, drawColor, drawLineHeight, drawDashWidth, drawDashSpace, drawIsLock }` | 用户触摸现有绘图项目时触发，返回绘图属性用于编辑 |
+| `onDrawItemComplete`  | `{}`                                                                                                 | 用户完成创建新绘图项目时触发                     |
+| `onDrawPointComplete` | `{ pointCount }`                                                                                     | 用户完成向绘图添加点时触发（对多点绘图有用）     |
 
 ## 🔧 OptionList 配置
 
@@ -208,17 +259,18 @@ XML 使用方式：
 
 ### 主要配置
 
-| 属性 | 类型 | 默认值 | 描述 |
-|----------|------|---------|-------------|
-| `modelArray` | Array | `[]` | K线数据数组（见下方数据格式） |
-| `shouldScrollToEnd` | Boolean | `true` | 加载时是否滚动到最新数据 |
-| `targetList` | Object | `{}` | 技术指标参数 |
-| `configList` | Object | `{}` | 视觉样式配置 |
-| `drawList` | Object | `{}` | 绘图工具配置 |
+| 属性                | 类型    | 默认值 | 描述                          |
+| ------------------- | ------- | ------ | ----------------------------- |
+| `modelArray`        | Array   | `[]`   | K线数据数组（见下方数据格式） |
+| `shouldScrollToEnd` | Boolean | `true` | 加载时是否滚动到最新数据      |
+| `targetList`        | Object  | `{}`   | 技术指标参数                  |
+| `configList`        | Object  | `{}`   | 视觉样式配置                  |
+| `drawList`          | Object  | `{}`   | 绘图工具配置                  |
 
 ### 数据格式 (modelArray)
 
 每个数据点应包含以下字段：
+
 - `id`: 时间戳
 - `open`: 开盘价
 - `high`: 最高价
@@ -233,65 +285,70 @@ XML 使用方式：
 
 ### 视觉配置 (configList)
 
-| 属性 | 类型 | 描述 |
-|----------|------|-------------|
-| `colorList` | Object | `{ increaseColor, decreaseColor }` - 涨跌颜色 |
-| `targetColorList` | Array | 指标线颜色数组 |
-| `backgroundColor` | Color | 图表背景色 |
-| `textColor` | Color | 全局文字颜色 |
-| `gridColor` | Color | 网格线颜色 |
-| `candleTextColor` | Color | 蜡烛标签文字颜色 |
-| `minuteLineColor` | Color | 分时图线条颜色 |
-| `minuteGradientColorList` | Array | 分时图背景渐变色 |
-| `minuteGradientLocationList` | Array | 渐变停止位置 [0, 0.3, 0.6, 1] |
-| `mainFlex` | Number | 主图高度比例 (0.6 - 0.85) |
-| `volumeFlex` | Number | 成交量图高度比例 (0.15 - 0.25) |
-| `paddingTop` | Number | 顶部内边距（像素） |
-| `paddingBottom` | Number | 底部内边距（像素） |
-| `paddingRight` | Number | 右侧内边距（像素） |
-| `itemWidth` | Number | 每根蜡烛总宽度（包括边距） |
-| `candleWidth` | Number | 实际蜡烛体宽度 |
-| `fontFamily` | String | 所有文字的字体 |
-| `headerTextFontSize` | Number | 标题文字大小 |
-| `rightTextFontSize` | Number | 右轴文字大小 |
-| `candleTextFontSize` | Number | 蜡烛数值文字大小 |
-| `panelTextFontSize` | Number | 信息面板文字大小 |
-| `panelMinWidth` | Number | 信息面板最小宽度 |
+| 属性                         | 类型   | 描述                                          |
+| ---------------------------- | ------ | --------------------------------------------- |
+| `colorList`                  | Object | `{ increaseColor, decreaseColor }` - 涨跌颜色 |
+| `targetColorList`            | Array  | 指标线颜色数组                                |
+| `backgroundColor`            | Color  | 图表背景色                                    |
+| `textColor`                  | Color  | 全局文字颜色                                  |
+| `gridColor`                  | Color  | 网格线颜色                                    |
+| `candleTextColor`            | Color  | 蜡烛标签文字颜色                              |
+| `minuteLineColor`            | Color  | 分时图线条颜色                                |
+| `minuteGradientColorList`    | Array  | 分时图背景渐变色                              |
+| `minuteGradientLocationList` | Array  | 渐变停止位置 [0, 0.3, 0.6, 1]                 |
+| `mainFlex`                   | Number | 主图高度比例 (0.6 - 0.85)                     |
+| `volumeFlex`                 | Number | 成交量图高度比例 (0.15 - 0.25)                |
+| `paddingTop`                 | Number | 顶部内边距（像素）                            |
+| `paddingBottom`              | Number | 底部内边距（像素）                            |
+| `paddingRight`               | Number | 右侧内边距（像素）                            |
+| `itemWidth`                  | Number | 每根蜡烛总宽度（包括边距）                    |
+| `candleWidth`                | Number | 实际蜡烛体宽度                                |
+| `fontFamily`                 | String | 所有文字的字体                                |
+| `headerTextFontSize`         | Number | 标题文字大小                                  |
+| `rightTextFontSize`          | Number | 右轴文字大小                                  |
+| `candleTextFontSize`         | Number | 蜡烛数值文字大小                              |
+| `panelTextFontSize`          | Number | 信息面板文字大小                              |
+| `panelMinWidth`              | Number | 信息面板最小宽度                              |
 
 ### 绘图配置 (drawList)
 
-| 属性 | 类型 | 描述 |
-|----------|------|-------------|
-| `drawType` | Number | 当前绘图工具类型 (0=无, 1=趋势线, 2=水平线等) |
-| `shouldReloadDrawItemIndex` | Number | 绘图状态管理 |
-| `drawShouldContinue` | Boolean | 完成一个项目后是否继续绘图 |
-| `shouldClearDraw` | Boolean | 清除所有绘图的标志 |
-| `shouldFixDraw` | Boolean | 完成当前绘图的标志 |
-| `shotBackgroundColor` | Color | 绘图覆盖层背景色 |
+| 属性                        | 类型    | 描述                                          |
+| --------------------------- | ------- | --------------------------------------------- |
+| `drawType`                  | Number  | 当前绘图工具类型 (0=无, 1=趋势线, 2=水平线等) |
+| `shouldReloadDrawItemIndex` | Number  | 绘图状态管理                                  |
+| `drawShouldContinue`        | Boolean | 完成一个项目后是否继续绘图                    |
+| `shouldClearDraw`           | Boolean | 清除所有绘图的标志                            |
+| `shouldFixDraw`             | Boolean | 完成当前绘图的标志                            |
+| `shotBackgroundColor`       | Color   | 绘图覆盖层背景色                              |
 
 ### 技术指标配置 (targetList)
 
 包含各种技术指标的参数设置：
 
 **移动平均线设置**：
+
 - `maList`: MA线配置数组
 - `maVolumeList`: 成交量MA配置
 
 **布林带参数**：
+
 - `bollN`: 周期 (默认 "20")
 - `bollP`: 标准差倍数 (默认 "2")
 
 **MACD参数**：
+
 - `macdS`: 快线EMA周期 (默认 "12")
-- `macdL`: 慢线EMA周期 (默认 "26") 
+- `macdL`: 慢线EMA周期 (默认 "26")
 - `macdM`: 信号线周期 (默认 "9")
 
 **KDJ参数**：
+
 - `kdjN`: 周期 (默认 "9")
 - `kdjM1`: K值平滑 (默认 "3")
 - `kdjM2`: D值平滑 (默认 "3")
 
 **RSI和WR设置**：
+
 - `rsiList`: RSI配置数组
 - `wrList`: WR配置数组
 
@@ -306,6 +363,7 @@ XML 使用方式：
 本项目是对 [@tifezh](https://github.com/tifezh) 的原始 [KChartView](https://github.com/tifezh/KChartView) 的重大演进和增强。虽然受到原始Android专用库的启发，但这个React Native实现已经被完全重写，包含了许多额外功能：
 
 ### 相比原项目的主要增强
+
 - ✅ **跨平台支持** - iOS 和 Android
 - ✅ **React Native 集成** - 原生桥接实现
 - ✅ **交互式绘图工具** - 完整的多工具绘图系统
@@ -319,6 +377,7 @@ XML 使用方式：
 - ✅ **专业指标** - 扩展的技术分析能力
 
 代码库已完全重写以：
+
 - 适配React Native的架构和桥接系统
 - 使用Swift和Objective-C实现iOS支持
 - 添加原版中不存在的综合绘图功能
@@ -345,4 +404,4 @@ XML 使用方式：
     <a href="#-组件属性">API</a> •
     <a href="#-许可证">许可证</a>
   </p>
-</div> 
+</div>

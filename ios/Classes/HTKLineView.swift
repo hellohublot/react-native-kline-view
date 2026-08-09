@@ -42,6 +42,8 @@ class HTKLineView: UIScrollView {
 
     var lastLoadAnimationSource = ""
 
+    private var tradeMarkersDebounce: DispatchWorkItem?
+
 
 
 
@@ -84,6 +86,7 @@ class HTKLineView: UIScrollView {
     }
 
     func reloadConfigManager(_ configManager: HTKLineConfigManager) {
+        isScrollEnabled = configManager.scrollEnabled
 
         switch configManager.childType {
         case .none:
@@ -137,6 +140,22 @@ class HTKLineView: UIScrollView {
     }
 
     func reloadContentSize() {
+        if configManager.fitBarsCount > 0, bounds.size.width > configManager.paddingRight {
+            let visibleCount = max(1, min(configManager.modelArray.count, configManager.fitBarsCount))
+            let availableWidth = bounds.size.width - configManager.paddingRight
+            let fittedItemWidth = max(0.2, availableWidth / CGFloat(visibleCount))
+            configManager._itemWidth = fittedItemWidth
+            configManager._candleWidth = max(0.1, fittedItemWidth * 0.72)
+            configManager.reloadScrollViewScale(1)
+            scale = 1
+            isScrollEnabled = false
+            setZoomScale(1, animated: false)
+            panGestureRecognizer.isEnabled = false
+            panGestureRecognizer.isEnabled = true
+            return
+        }
+
+        isScrollEnabled = configManager.scrollEnabled
         configManager.reloadScrollViewScale(scale)
         let contentWidth = configManager.itemWidth * CGFloat(configManager.modelArray.count) + configManager.paddingRight
         contentSize = CGSize.init(width: contentWidth, height: frame.size.height)
@@ -161,6 +180,9 @@ class HTKLineView: UIScrollView {
         }
 
         calculateBaseHeight()
+        if configManager.useCustomTradeMarker {
+            emitTradeMarkersDebounced()
+        }
         contextTranslate(context, CGFloat(visibleRange.lowerBound) * configManager.itemWidth, { context in
             drawCandle(context)
         })
@@ -176,7 +198,9 @@ class HTKLineView: UIScrollView {
 
             drawHighLow(context)
             drawTime(context)
-            drawClosePrice(context)
+            if configManager.paddingRight > 0 {
+                drawClosePrice(context)
+            }
             drawSelectedLine(context)
             drawSelectedBoard(context)
             drawSelectedTime(context)
@@ -595,6 +619,42 @@ class HTKLineView: UIScrollView {
     func viewPointFromValuePoint(_ point: CGPoint) -> CGPoint {
         return CGPoint.init(x: xFromValue(point.x), y: yFromValue(point.y))
     }
+
+    private func computeTradeMarkerPositions() -> [[String: Any]] {
+        guard configManager.useCustomTradeMarker, mainHeight > 0 else { return [] }
+        let maxValue = mainMinMaxRange.upperBound
+        let minValue = mainMinMaxRange.lowerBound
+        let scale = (maxValue - minValue) / mainHeight
+        guard scale != 0 else { return [] }
+
+        var markers: [[String: Any]] = []
+        let paddingHorizontal = (configManager.itemWidth - configManager.lineWidth) / 2
+        for (i, model) in visibleModelArray.enumerated() {
+            let absoluteIndex = visibleRange.lowerBound + i
+            let cx = CGFloat(absoluteIndex) * configManager.itemWidth + paddingHorizontal - contentOffset.x
+            if !model.openTradePrice.isNaN, !model.openTradePrice.isInfinite, model.openTradeCount > 0 {
+                let y = mainBaseY + (maxValue - model.openTradePrice) / scale
+                let timestamp = model.openTradeTimestamp.isNaN ? model.id : model.openTradeTimestamp
+                markers.append(["x": cx, "y": y, "price": model.openTradePrice, "type": "buy", "count": model.openTradeCount, "timestamp": timestamp])
+            }
+            if !model.closeTradePrice.isNaN, !model.closeTradePrice.isInfinite, model.closeTradeCount > 0 {
+                let y = mainBaseY + (maxValue - model.closeTradePrice) / scale
+                let timestamp = model.closeTradeTimestamp.isNaN ? model.id : model.closeTradeTimestamp
+                markers.append(["x": cx, "y": y, "price": model.closeTradePrice, "type": "sell", "count": model.closeTradeCount, "timestamp": timestamp])
+            }
+        }
+        return markers
+    }
+
+    private func emitTradeMarkersDebounced() {
+        tradeMarkersDebounce?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.configManager.onTradeMarkersLayout?(self.computeTradeMarkerPositions())
+        }
+        tradeMarkersDebounce = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: work)
+    }
     
 
 }
@@ -634,6 +694,10 @@ extension HTKLineView: UIScrollViewDelegate {
 
     @objc
     func pinchSelector(_ gesture: UIPinchGestureRecognizer) {
+        if configManager.fitBarsCount > 0 {
+            return
+        }
+
         switch gesture.state {
         case .changed:
             scale += (gesture.scale - 1) / 10

@@ -340,4 +340,10 @@ public abstract class ScrollAndScaleView extends RelativeLayout implements
     public float getScaleX() {
         return mScaleX;
     }
+
+    public void resetChartScale() {
+        float oldScale = mScaleX;
+        mScaleX = 1f;
+        onScaleChanged(mScaleX, oldScale);
+    }
 }

@@ -50,6 +50,10 @@ class HTVolumeDraw: NSObject, HTKLineDrawProtocol {
     }
 
     func drawText(_ model: HTKLineModel, _ baseX: CGFloat, _ baseY: CGFloat, _ context: CGContext, _ configManager: HTKLineConfigManager) {
+        if configManager.volumeFlex <= 0 {
+            return
+        }
+
         var x = baseX
         let font = configManager.createFont(configManager.headerTextFontSize)
         x += drawText(title: String(format: "VOL:%@", configManager.precision(model.volume, configManager.volume)), point: CGPoint.init(x: x, y: baseY), color: configManager.targetColorList[5], font: font, context: context, configManager: configManager)

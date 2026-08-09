@@ -81,6 +81,10 @@ public class VolumeDraw implements IChartDraw<IVolume> {
     @Override
     public void drawText(
             @NonNull Canvas canvas, @NonNull BaseKLineChartView view, int position, float x, float y) {
+        if (view.configManager.volumeFlex <= 0f) {
+            return;
+        }
+
         IValueFormatter formatter = getValueFormatter();
         KLineEntity point = (KLineEntity) view.getItem(position);
         if (formatter instanceof ValueFormatter) {

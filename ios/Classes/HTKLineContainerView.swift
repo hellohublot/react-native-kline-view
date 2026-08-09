@@ -16,6 +16,15 @@ class HTKLineContainerView: UIView {
     @objc var onDrawItemComplete: RCTBubblingEventBlock?
     
     @objc var onDrawPointComplete: RCTBubblingEventBlock?
+
+    @objc var onTradeMarkersLayout: RCTBubblingEventBlock?
+
+    @objc var useCustomTradeMarker: Bool = false {
+        didSet {
+            configManager.useCustomTradeMarker = useCustomTradeMarker
+            klineView.setNeedsDisplay()
+        }
+    }
     
     @objc var optionList: String? {
         didSet {
@@ -109,6 +118,9 @@ class HTKLineContainerView: UIView {
             self?.onDrawPointComplete?([
                 "pointCount": drawItem.pointList.count
             ])
+        }
+        configManager.onTradeMarkersLayout = { [weak self] markers in
+            self?.onTradeMarkersLayout?(["markers": markers])
         }
         
         let reloadIndex = configManager.shouldReloadDrawItemIndex

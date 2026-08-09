@@ -29,6 +29,8 @@ public class RNKLineView extends SimpleViewManager<HTKLineContainerView> {
 
 	public static String onDrawPointCompleteKey = "onDrawPointComplete";
 
+    public static String onTradeMarkersLayoutKey = "onTradeMarkersLayout";
+
     @Nonnull
     @Override
     public String getName() {
@@ -47,9 +49,16 @@ public class RNKLineView extends SimpleViewManager<HTKLineContainerView> {
 		return MapBuilder.of(
 				onDrawItemDidTouchKey, MapBuilder.of("registrationName", onDrawItemDidTouchKey),
 				onDrawItemCompleteKey, MapBuilder.of("registrationName", onDrawItemCompleteKey),
-				onDrawPointCompleteKey, MapBuilder.of("registrationName", onDrawPointCompleteKey)
+                onDrawPointCompleteKey, MapBuilder.of("registrationName", onDrawPointCompleteKey),
+                onTradeMarkersLayoutKey, MapBuilder.of("registrationName", onTradeMarkersLayoutKey)
 		);
 	}
+
+    @ReactProp(name = "useCustomTradeMarker")
+    public void setUseCustomTradeMarker(final HTKLineContainerView containerView, boolean useCustomTradeMarker) {
+        containerView.configManager.useCustomTradeMarker = useCustomTradeMarker;
+        containerView.klineView.invalidate();
+    }
 
 
 

@@ -70,6 +70,10 @@ class HTKLineConfigManager: NSObject {
 
     var shouldScrollToEnd = true
 
+    var scrollEnabled = true
+
+    var fitBarsCount: Int = 0
+
     var maList = [HTKLineItemModel]()
 
     var maVolumeList = [HTKLineItemModel]()
@@ -257,6 +261,10 @@ class HTKLineConfigManager: NSObject {
     var onDrawItemComplete: HTKLineDrawItemBlock?
     
     var onDrawPointComplete: HTKLineDrawItemBlock?
+
+    var useCustomTradeMarker: Bool = false
+
+    var onTradeMarkersLayout: (([[String: Any]]) -> Void)?
     
     // -3 表示没有弹起任何弹窗, -2 表示弹起了画笔弹窗没有弹起 context 弹窗, -1 表示弹起了弹窗, 弹窗表示的是全局配置, 其他表示正常的 index
     var shouldReloadDrawItemIndex = -3
@@ -319,8 +327,17 @@ class HTKLineConfigManager: NSObject {
     }
 
     func reloadOptionList(_ optionList: [String: Any]) {
+        if let fitBarsCount = optionList["fitBarsCount"] as? Int {
+            self.fitBarsCount = max(0, fitBarsCount)
+        } else if let fitBarsCount = optionList["fitBarsCount"] as? CGFloat {
+            self.fitBarsCount = max(0, Int(fitBarsCount))
+        }
+
         if let modelList = optionList["modelArray"] as? [[String: Any]] {
             modelArray = HTKLineModel.packModelArray(modelList)
+            if fitBarsCount > 0, modelArray.count > fitBarsCount {
+                modelArray = Array(modelArray.suffix(fitBarsCount))
+            }
         }
         
 
@@ -382,6 +399,9 @@ class HTKLineConfigManager: NSObject {
 
         if let shouldScrollToEnd = optionList["shouldScrollToEnd"] as? Bool {
             self.shouldScrollToEnd = shouldScrollToEnd
+        }
+        if let scrollEnabled = optionList["scrollEnabled"] as? Bool {
+            self.scrollEnabled = scrollEnabled
         }
         if shouldReloadDrawItemIndex >= HTDrawState.showPencil.rawValue {
             self.shouldScrollToEnd = false

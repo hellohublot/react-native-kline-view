@@ -20,10 +20,14 @@ import com.github.fujianlian.klinechart.entity.IKLine;
 import com.github.fujianlian.klinechart.formatter.TimeFormatter;
 import com.github.fujianlian.klinechart.formatter.ValueFormatter;
 import com.github.fujianlian.klinechart.utils.ViewUtil;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * k线图
@@ -34,6 +38,9 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
     public HTKLineConfigManager configManager;
 
     public HTDrawContext drawContext;
+
+    private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+    private Runnable mTradeMarkersRunnable;
 
 
 
@@ -275,7 +282,9 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
             drawText(canvas);
             drawMaxAndMin(canvas);
             drawValue(canvas, isLongPress ? mSelectedIndex : mStopIndex);
-            drawClosePriceLine(canvas);
+            if (configManager.paddingRight > 0) {
+                drawClosePriceLine(canvas);
+            }
             drawSelector(canvas);
         }
         canvas.restore();
@@ -285,6 +294,10 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
 //        path.addRect(0, mMainRect.top, getMaxScrollX() + getWidth(), mMainRect.bottom, Path.Direction.CW);
 //        canvas.clipPath(path);
         drawContext.onDraw(canvas);
+
+        if (configManager.useCustomTradeMarker && configManager.onTradeMarkersLayout != null) {
+            emitTradeMarkersDebounced();
+        }
     }
 
     public float yFromValue(float value) {
@@ -548,7 +561,7 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
             }
         }
         //--------------画中间子图的值-------------
-        if (mVolDraw != null) {
+        if (mVolDraw != null && mVolRect.height() > 0) {
             IValueFormatter formatter = mVolDraw.getValueFormatter();
             if (formatter instanceof ValueFormatter) {
                 ValueFormatter valueFormatter = (ValueFormatter)formatter;
@@ -819,6 +832,55 @@ public abstract class BaseKLineChartView extends ScrollAndScaleView implements D
         initRect();
         initLottieView();
         invalidate();
+    }
+
+    private void emitTradeMarkersDebounced() {
+        if (mTradeMarkersRunnable != null) {
+            mMainHandler.removeCallbacks(mTradeMarkersRunnable);
+        }
+        mTradeMarkersRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (configManager.onTradeMarkersLayout != null) {
+                    configManager.onTradeMarkersLayout.invoke((Object) computeTradeMarkerPositions());
+                }
+            }
+        };
+        mMainHandler.postDelayed(mTradeMarkersRunnable, 50);
+    }
+
+    private List<Map<String, Object>> computeTradeMarkerPositions() {
+        List<Map<String, Object>> markers = new ArrayList<>();
+        if (mItemCount <= 0 || mMainMaxValue == mMainMinValue) return markers;
+        float density = getResources().getDisplayMetrics().density;
+        for (int i = mStartIndex; i <= mStopIndex; i++) {
+            if (i < 0 || i >= configManager.modelArray.size()) continue;
+            KLineEntity model = configManager.modelArray.get(i);
+            float cx = scrollXtoViewX(getItemMiddleScrollX(i)) / density;
+            if (!Float.isNaN(model.openTradePrice) && !Float.isInfinite(model.openTradePrice) && model.openTradeCount > 0) {
+                float y = yFromValue(model.openTradePrice) / density;
+                Map<String, Object> m = new HashMap<>();
+                m.put("x", (double) cx);
+                m.put("y", (double) y);
+                m.put("price", (double) model.openTradePrice);
+                m.put("type", "buy");
+                m.put("count", model.openTradeCount);
+                m.put("timestamp", Double.isNaN(model.openTradeTimestamp) ? (double) model.id : model.openTradeTimestamp);
+                markers.add(m);
+            }
+            if (!Float.isNaN(model.closeTradePrice) && !Float.isInfinite(model.closeTradePrice) && model.closeTradeCount > 0) {
+                float y = yFromValue(model.closeTradePrice) / density;
+                Map<String, Object> m = new HashMap<>();
+                m.put("x", (double) cx);
+                m.put("y", (double) y);
+                m.put("price", (double) model.closeTradePrice);
+                m.put("type", "sell");
+                m.put("count", model.closeTradeCount);
+                m.put("timestamp", Double.isNaN(model.closeTradeTimestamp) ? (double) model.id : model.closeTradeTimestamp);
+                markers.add(m);
+            }
+        }
+        return markers;
     }
 
     /**
